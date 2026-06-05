@@ -30,9 +30,14 @@ export async function middleware(request: NextRequest) {
 
   // Kiểm tra nếu là route CRM hoặc API cần bảo vệ
   const isCrmRoute = pathname.startsWith("/crm");
-  const isProtectedApi = PROTECTED_API_PATHS.some((path) =>
+  let isProtectedApi = PROTECTED_API_PATHS.some((path) =>
     pathname.startsWith(path)
   );
+
+  // Cho phép khách hàng public đăng ký mới (POST /api/customers)
+  if (pathname === "/api/customers" && request.method === "POST") {
+    isProtectedApi = false;
+  }
 
   if (!isCrmRoute && !isProtectedApi) return NextResponse.next();
 
