@@ -9,7 +9,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/crm/dashboard";
 
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ email: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -80,21 +80,7 @@ function LoginForm() {
               />
             </div>
 
-            <div>
-              <label className="block text-slate-300 text-sm font-medium mb-2">
-                Mật khẩu
-              </label>
-              <input
-                id="input-password"
-                type="password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
-                autoComplete="current-password"
-                placeholder="••••••••"
-                className="w-full bg-slate-800/80 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all"
-              />
-            </div>
+
 
             {status === "error" && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">

@@ -30,8 +30,9 @@ export async function POST(request: Request) {
     const client = await clientPromise;
     const db = client.db(process.env.MONGODB_DB);
 
+    // Tìm kiếm email không phân biệt chữ hoa/thường
     const staff = await db.collection("staff_users").findOne({
-      email: email.toLowerCase().trim(),
+      email: { $regex: new RegExp(`^${email.trim()}$`, "i") },
     });
 
     if (!staff) {
@@ -44,7 +45,7 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(newPassword, 12);
 
     await db.collection("staff_users").updateOne(
-      { _id: new ObjectId(staff._id) },
+      { email: staff.email },
       {
         $set: {
           password: hashedPassword,

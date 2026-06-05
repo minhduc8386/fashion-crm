@@ -5,11 +5,11 @@ import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    const { email } = await request.json();
 
-    if (!email || !password) {
+    if (!email) {
       return NextResponse.json(
-        { success: false, message: "Vui lòng nhập email và mật khẩu." },
+        { success: false, message: "Vui lòng nhập email." },
         { status: 400 }
       );
     }
@@ -18,33 +18,13 @@ export async function POST(request: Request) {
     const db = client.db(process.env.MONGODB_DB);
 
     const staff = await db.collection("staff_users").findOne({
-      email: email.toLowerCase().trim(),
+      email: { $regex: new RegExp(`^${email.trim()}$`, "i") },
       status: "active",
     });
 
     if (!staff) {
       return NextResponse.json(
-        { success: false, message: "Email hoặc mật khẩu không đúng." },
-        { status: 401 }
-      );
-    }
-
-    // Nếu chưa có password (lần đầu thiết lập)
-    if (!staff.password) {
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Tài khoản chưa được thiết lập mật khẩu. Vui lòng liên hệ Admin.",
-        },
-        { status: 401 }
-      );
-    }
-
-    const isValidPassword = await bcrypt.compare(password, staff.password);
-    if (!isValidPassword) {
-      return NextResponse.json(
-        { success: false, message: "Email hoặc mật khẩu không đúng." },
+        { success: false, message: "Không tìm thấy nhân viên với email này." },
         { status: 401 }
       );
     }
