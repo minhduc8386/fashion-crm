@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import CrmNavbar from "@/components/CrmNavbar";
 
-interface Customer { _id: string; name: string; phone: string; }
+interface Customer { _id: string; name?: string; full_name?: string; phone: string; }
 interface InvoiceItem { product_name: string; quantity: number; price: number; }
 interface Invoice {
   _id: string; customer_name: string; items: InvoiceItem[];
@@ -61,7 +61,7 @@ export default function InvoicesPage() {
       const res = await fetch("/api/invoices", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customer_id: selectedCustomer, customer_name: customer?.name || "", items, notes }),
+        body: JSON.stringify({ customer_id: selectedCustomer, customer_name: customer?.name || customer?.full_name || "", items, notes }),
       });
       const data = await res.json();
 
@@ -126,7 +126,7 @@ export default function InvoicesPage() {
                   <option value="">-- Chọn khách hàng --</option>
                   {customers.map((c) => (
                     <option key={c._id} value={c._id} className="bg-slate-800">
-                      {c.name} – {c.phone}
+                      {c.name || c.full_name || "Khách hàng ẩn danh"} – {c.phone}
                     </option>
                   ))}
                 </select>

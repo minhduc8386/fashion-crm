@@ -5,7 +5,8 @@ import CrmNavbar from "@/components/CrmNavbar";
 
 interface Customer {
   _id: string;
-  name: string;
+  name?: string;
+  full_name?: string;
   phone: string;
   email: string;
   address: string;
@@ -111,12 +112,14 @@ export default function CustomersPage() {
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
 
-  const filteredCustomers = customers.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.phone.includes(search) ||
+  const filteredCustomers = customers.filter((c) => {
+    const custName = c.name || c.full_name || "";
+    return (
+      custName.toLowerCase().includes(search.toLowerCase()) ||
+      (c.phone || "").includes(search) ||
       (c.email || "").toLowerCase().includes(search.toLowerCase())
-  );
+    );
+  });
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -263,7 +266,7 @@ export default function CustomersPage() {
                 {filteredCustomers.map((c, i) => (
                   <tr key={c._id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td className="px-4 py-3 text-slate-500">{i + 1}</td>
-                    <td className="px-4 py-3 text-white font-medium">{c.name}</td>
+                    <td className="px-4 py-3 text-white font-medium">{c.name || c.full_name || "–"}</td>
                     <td className="px-4 py-3 text-slate-300">{c.phone}</td>
                     <td className="px-4 py-3 text-slate-300 hidden md:table-cell">{c.email || "–"}</td>
                     <td className="px-4 py-3 text-purple-300 text-right font-medium">{formatCurrency(c.total_spent || 0)}</td>
