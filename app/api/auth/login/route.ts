@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { signToken, COOKIE_NAME } from "@/lib/auth";
-import bcrypt from "bcryptjs";
 
 export async function POST(request: Request) {
   try {

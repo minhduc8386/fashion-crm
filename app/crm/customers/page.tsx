@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import CrmNavbar from "@/components/CrmNavbar";
 
 interface Customer {
@@ -13,6 +14,8 @@ interface Customer {
   total_spent: number;
   invoice_count: number;
   created_at: string;
+  device_model?: string;
+  is_seeded?: boolean;
 }
 
 const EMPTY_FORM = { name: "", phone: "", email: "", address: "", notes: "" };
@@ -32,6 +35,7 @@ function validateEmail(email: string): string | null {
 }
 
 export default function CustomersPage() {
+  const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -257,20 +261,40 @@ export default function CustomersPage() {
                   <th className="px-4 py-3 font-medium">#</th>
                   <th className="px-4 py-3 font-medium">Họ tên</th>
                   <th className="px-4 py-3 font-medium">Điện thoại</th>
-                  <th className="px-4 py-3 font-medium hidden md:table-cell">Email</th>
-                  <th className="px-4 py-3 font-medium text-right">Đã chi</th>
+                  <th className="px-4 py-3 font-medium hidden lg:table-cell">Địa chỉ</th>
+                  <th className="px-4 py-3 font-medium hidden md:table-cell">Thiết bị</th>
+                  <th className="px-4 py-3 font-medium text-right">LTV</th>
                   <th className="px-4 py-3 font-medium text-right">HĐ</th>
+                  <th className="px-4 py-3 font-medium text-right">Chi tiết</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredCustomers.map((c, i) => (
-                  <tr key={c._id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                  <tr
+                    key={c._id}
+                    className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group"
+                    onClick={() => router.push(`/crm/customers/${c._id}`)}
+                  >
                     <td className="px-4 py-3 text-slate-500">{i + 1}</td>
-                    <td className="px-4 py-3 text-white font-medium">{c.name || c.full_name || "–"}</td>
-                    <td className="px-4 py-3 text-slate-300">{c.phone}</td>
-                    <td className="px-4 py-3 text-slate-300 hidden md:table-cell">{c.email || "–"}</td>
-                    <td className="px-4 py-3 text-purple-300 text-right font-medium">{formatCurrency(c.total_spent || 0)}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600/50 to-blue-600/50 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                          {(c.name || c.full_name || "?").charAt(0).toUpperCase()}
+                        </div>
+                        <span className="text-white font-medium capitalize">{c.name || c.full_name || "–"}</span>
+                        {c.is_seeded && (
+                          <span className="text-xs text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded-full">FPT</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-slate-300 font-mono text-xs">{c.phone}</td>
+                    <td className="px-4 py-3 text-slate-400 text-xs max-w-[180px] truncate hidden lg:table-cell">{c.address || "–"}</td>
+                    <td className="px-4 py-3 text-slate-400 text-xs hidden md:table-cell">{c.device_model || "–"}</td>
+                    <td className="px-4 py-3 text-purple-300 text-right font-semibold">{formatCurrency(c.total_spent || 0)}</td>
                     <td className="px-4 py-3 text-slate-300 text-right">{c.invoice_count || 0}</td>
+                    <td className="px-4 py-3 text-right">
+                      <span className="text-xs text-purple-400 group-hover:text-purple-300 transition-colors">360° →</span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
