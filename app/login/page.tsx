@@ -1,140 +1,96 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/crm/dashboard";
-
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // Nếu đã login rồi thì redirect luôn
-  useEffect(() => {
-    fetch("/api/auth/me")
-      .then((r) => r.json())
-      .then((d) => { if (d.success) router.replace(redirectTo); })
-      .catch(() => {});
-  }, [redirectTo, router]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) {
-      setStatus("error");
-      setErrorMsg("Vui lòng nhập email nhân viên.");
-      return;
-    }
-    setStatus("loading");
-    setErrorMsg("");
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email }),
       });
-      const data = await res.json();
+      const json = await res.json();
 
-      if (data.success) {
-        router.push(redirectTo);
-        router.refresh();
-      } else {
-        setStatus("error");
-        setErrorMsg(data.message || "Đăng nhập thất bại.");
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Không thể đăng nhập.");
       }
-    } catch {
-      setStatus("error");
-      setErrorMsg("Không thể kết nối server. Vui lòng thử lại.");
+
+      router.replace(searchParams.get("redirect") || "/crm/dashboard");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Không thể đăng nhập.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex items-center justify-center p-6">
-      <div className="w-full max-w-sm">
+    <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <label className="block text-sm font-medium text-slate-700">
+        Email nhân viên
+        <input
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+          placeholder="staffA@fashionx.com"
+          className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        />
+      </label>
 
-        {/* Brand */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-600/20 border border-purple-500/30 mb-4">
-            <span className="text-3xl">✦</span>
-          </div>
-          <h1 className="text-2xl font-bold text-white">Fashion CRM</h1>
-          <p className="text-slate-400 text-sm mt-1">Đăng nhập dành cho nhân viên</p>
-        </div>
-
-        {/* Card */}
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 shadow-2xl">
-          <form onSubmit={handleSubmit} id="login-form" className="space-y-5">
-
-            {/* Email field */}
-            <div>
-              <label className="block text-slate-300 text-sm font-medium mb-2">
-                Email nhân viên
-              </label>
-              <input
-                id="input-email"
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (status === "error") setStatus("idle");
-                }}
-                required
-                autoFocus
-                autoComplete="email"
-                placeholder="staffA@fashionx.com"
-                className="w-full bg-slate-800/80 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 transition-all"
-              />
-            </div>
-
-            {/* Error message */}
-            {status === "error" && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
-                <p className="text-red-400 text-sm text-center">{errorMsg}</p>
-              </div>
-            )}
-
-            {/* Submit button */}
-            <button
-              id="btn-login"
-              type="submit"
-              disabled={status === "loading"}
-              className="w-full bg-purple-600 hover:bg-purple-500 active:bg-purple-700 disabled:bg-purple-900 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-all duration-200"
-            >
-              {status === "loading" ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Đang đăng nhập...
-                </span>
-              ) : (
-                "Đăng nhập"
-              )}
-            </button>
-          </form>
-        </div>
-
-        {/* Register link */}
-        <p className="text-center text-slate-500 text-xs mt-6">
-          Bạn là khách hàng?{" "}
-          <a href="/register" className="text-purple-400 hover:text-purple-300 transition-colors">
-            Đăng ký thành viên →
-          </a>
+      {error && (
+        <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700">
+          {error}
         </p>
+      )}
 
-      </div>
-    </div>
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+      >
+        {loading ? "Đang đăng nhập..." : "Vào CRM"}
+      </button>
+    </form>
   );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense>
-      <LoginForm />
-    </Suspense>
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
+      <section className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
+        <Link href="/" className="text-sm font-medium text-blue-600 hover:text-blue-700">
+          ← Trang chủ
+        </Link>
+        <div className="mt-6">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-900 text-sm font-bold text-white">
+            FX
+          </div>
+          <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950">
+            Đăng nhập nhân viên
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">
+            Chỉ cần email có trong collection staff_users. Hệ thống không dùng password.
+          </p>
+        </div>
+
+        <Suspense>
+          <LoginForm />
+        </Suspense>
+      </section>
+    </main>
   );
 }

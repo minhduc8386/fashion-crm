@@ -9,15 +9,17 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
       <div className="max-w-2xl w-full text-center">
         {/* Logo / Brand */}
         <div className="mb-8">
-          <span className="inline-block text-5xl mb-4">✦</span>
-          <h1 className="text-4xl font-bold text-white tracking-tight mb-2">
+          <span className="inline-flex h-16 w-16 items-center justify-center rounded-xl bg-slate-900 text-lg font-bold text-white mb-4">
+            FX
+          </span>
+          <h1 className="text-4xl font-semibold text-slate-950 tracking-tight mb-2">
             Fashion CRM
           </h1>
-          <p className="text-purple-300 text-lg">
+          <p className="text-slate-600 text-lg">
             Hệ thống quản lý khách hàng – Nhãn hàng thời trang X
           </p>
         </div>
@@ -27,13 +29,13 @@ export default function HomePage() {
           <Link
             href="/register"
             id="link-register"
-            className="group bg-white/10 hover:bg-white/20 border border-white/20 hover:border-purple-400 rounded-2xl p-6 text-left transition-all duration-200"
+            className="group bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-lg p-6 text-left transition-all duration-200 shadow-sm"
           >
             <div className="text-3xl mb-3">📝</div>
-            <h2 className="text-white font-semibold text-lg mb-1">
+            <h2 className="text-slate-950 font-semibold text-lg mb-1">
               Đăng ký khách hàng
             </h2>
-            <p className="text-purple-200 text-sm">
+            <p className="text-slate-600 text-sm">
               Khách hàng tự điền thông tin đăng ký
             </p>
           </Link>
@@ -41,11 +43,11 @@ export default function HomePage() {
           <Link
             href="/crm/dashboard"
             id="link-dashboard"
-            className="group bg-white/10 hover:bg-white/20 border border-white/20 hover:border-purple-400 rounded-2xl p-6 text-left transition-all duration-200"
+            className="group bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-lg p-6 text-left transition-all duration-200 shadow-sm"
           >
             <div className="text-3xl mb-3">📊</div>
-            <h2 className="text-white font-semibold text-lg mb-1">Dashboard</h2>
-            <p className="text-purple-200 text-sm">
+            <h2 className="text-slate-950 font-semibold text-lg mb-1">Dashboard</h2>
+            <p className="text-slate-600 text-sm">
               Tổng quan doanh thu và thống kê
             </p>
           </Link>
@@ -53,13 +55,13 @@ export default function HomePage() {
           <Link
             href="/crm/customers"
             id="link-customers"
-            className="group bg-white/10 hover:bg-white/20 border border-white/20 hover:border-purple-400 rounded-2xl p-6 text-left transition-all duration-200"
+            className="group bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-lg p-6 text-left transition-all duration-200 shadow-sm"
           >
             <div className="text-3xl mb-3">👥</div>
-            <h2 className="text-white font-semibold text-lg mb-1">
+            <h2 className="text-slate-950 font-semibold text-lg mb-1">
               Quản lý khách hàng
             </h2>
-            <p className="text-purple-200 text-sm">
+            <p className="text-slate-600 text-sm">
               Nhập và xem danh sách khách hàng
             </p>
           </Link>
@@ -67,21 +69,21 @@ export default function HomePage() {
           <Link
             href="/crm/invoices"
             id="link-invoices"
-            className="group bg-white/10 hover:bg-white/20 border border-white/20 hover:border-purple-400 rounded-2xl p-6 text-left transition-all duration-200"
+            className="group bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-200 rounded-lg p-6 text-left transition-all duration-200 shadow-sm"
           >
             <div className="text-3xl mb-3">🧾</div>
-            <h2 className="text-white font-semibold text-lg mb-1">
+            <h2 className="text-slate-950 font-semibold text-lg mb-1">
               Quản lý hoá đơn
             </h2>
-            <p className="text-purple-200 text-sm">
+            <p className="text-slate-600 text-sm">
               Tạo và xem lịch sử hoá đơn
             </p>
           </Link>
         </div>
 
         {/* Dev Tools */}
-        <div className="border-t border-white/10 pt-6">
-          <p className="text-purple-400 text-xs mb-3 uppercase tracking-wider">
+        <div className="border-t border-slate-200 pt-6">
+          <p className="text-slate-500 text-xs mb-3 uppercase tracking-wider">
             Dev Tools
           </p>
           <a
@@ -89,7 +91,7 @@ export default function HomePage() {
             id="link-api-test"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block text-purple-300 hover:text-white text-sm underline underline-offset-4 transition-colors"
+            className="inline-block text-blue-600 hover:text-blue-700 text-sm underline underline-offset-4 transition-colors"
           >
             /api/test – Kiểm tra kết nối MongoDB →
           </a>

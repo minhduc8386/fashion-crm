@@ -67,8 +67,10 @@ export async function GET(
     // Danh mục mua nhiều nhất
     const categoryCount: Record<string, number> = {};
     invoices.forEach((inv) => {
-      (inv.items || []).forEach((item: { category: string; quantity: number }) => {
-        categoryCount[item.category] = (categoryCount[item.category] || 0) + item.quantity;
+      (inv.items || []).forEach((item: { category?: string; quantity?: number }) => {
+        const category = item.category?.trim();
+        if (!category) return;
+        categoryCount[category] = (categoryCount[category] || 0) + (item.quantity || 0);
       });
     });
     const favorite_category =

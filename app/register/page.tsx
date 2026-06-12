@@ -48,32 +48,34 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
           <Link
             href="/"
-            className="text-purple-300 hover:text-white text-sm mb-4 inline-block transition-colors"
+            className="text-blue-600 hover:text-blue-700 text-sm mb-4 inline-block transition-colors"
           >
             ← Trang chủ
           </Link>
-          <div className="text-4xl mb-3">✦</div>
-          <h1 className="text-2xl font-bold text-white mb-2">Đăng ký thành viên</h1>
-          <p className="text-purple-300 text-sm">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-xl bg-slate-900 text-sm font-bold text-white">
+            FX
+          </div>
+          <h1 className="text-2xl font-semibold text-slate-950 mb-2">Đăng ký thành viên</h1>
+          <p className="text-slate-600 text-sm">
             Nhãn hàng thời trang X – Nhận ưu đãi độc quyền
           </p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 shadow-xl">
+        <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
           {status === "success" ? (
             <div className="text-center py-8">
               <div className="text-5xl mb-4">🎉</div>
-              <p className="text-green-300 font-semibold text-lg mb-2">{message}</p>
+              <p className="text-emerald-700 font-semibold text-lg mb-2">{message}</p>
               <button
                 onClick={() => setStatus("idle")}
-                className="mt-4 text-purple-300 hover:text-white text-sm underline transition-colors"
+                className="mt-4 text-blue-600 hover:text-blue-700 text-sm underline transition-colors"
               >
                 Đăng ký thêm
               </button>
@@ -81,8 +83,8 @@ export default function RegisterPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4" id="register-form">
               <div>
-                <label className="block text-purple-200 text-sm font-medium mb-1">
-                  Họ và tên <span className="text-red-400">*</span>
+                <label className="block text-slate-700 text-sm font-medium mb-1">
+                  Họ và tên <span className="text-red-600">*</span>
                 </label>
                 <input
                   id="input-name"
@@ -92,13 +94,13 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   required
                   placeholder="Nguyễn Văn A"
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-white placeholder-purple-400 focus:outline-none focus:border-purple-400 transition-colors"
+                  className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-purple-200 text-sm font-medium mb-1">
-                  Số điện thoại <span className="text-red-400">*</span>
+                <label className="block text-slate-700 text-sm font-medium mb-1">
+                  Số điện thoại <span className="text-red-600">*</span>
                 </label>
                 <input
                   id="input-phone"
@@ -108,12 +110,12 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   required
                   placeholder="0901234567"
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-white placeholder-purple-400 focus:outline-none focus:border-purple-400 transition-colors"
+                  className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-purple-200 text-sm font-medium mb-1">
+                <label className="block text-slate-700 text-sm font-medium mb-1">
                   Email
                 </label>
                 <input
@@ -123,12 +125,12 @@ export default function RegisterPage() {
                   value={form.email}
                   onChange={handleChange}
                   placeholder="example@email.com"
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-white placeholder-purple-400 focus:outline-none focus:border-purple-400 transition-colors"
+                  className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-purple-200 text-sm font-medium mb-1">
+                <label className="block text-slate-700 text-sm font-medium mb-1">
                   Địa chỉ
                 </label>
                 <input
@@ -138,12 +140,12 @@ export default function RegisterPage() {
                   value={form.address}
                   onChange={handleChange}
                   placeholder="Số nhà, đường, quận/huyện, tỉnh/thành"
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-white placeholder-purple-400 focus:outline-none focus:border-purple-400 transition-colors"
+                  className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-purple-200 text-sm font-medium mb-1">
+                <label className="block text-slate-700 text-sm font-medium mb-1">
                   Ghi chú
                 </label>
                 <textarea
@@ -153,12 +155,12 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   rows={3}
                   placeholder="Thông tin thêm (tuỳ chọn)"
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-white placeholder-purple-400 focus:outline-none focus:border-purple-400 transition-colors resize-none"
+                  className="w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-colors resize-none"
                 />
               </div>
 
               {status === "error" && (
-                <p className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-2">
+                <p className="text-red-700 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-2">
                   {message}
                 </p>
               )}
@@ -167,7 +169,7 @@ export default function RegisterPage() {
                 id="btn-register-submit"
                 type="submit"
                 disabled={status === "loading"}
-                className="w-full bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors duration-200"
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition-colors duration-200"
               >
                 {status === "loading" ? "Đang gửi..." : "Đăng ký ngay"}
               </button>

@@ -1,31 +1,46 @@
 import { SignJWT, jwtVerify } from "jose";
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
-const COOKIE_NAME = "fashion_crm_token";
-const TOKEN_EXPIRY = "8h"; // Token hết hạn sau 8 giờ
+export const AUTH_COOKIE = "fashion_crm_token";
 
-export interface JWTPayload {
-  userId: string;
+export interface StaffSession {
   email: string;
-  full_name: string;
-  role: string;
+  name?: string;
+  role?: string;
 }
 
-export async function signToken(payload: JWTPayload): Promise<string> {
-  return await new SignJWT({ ...payload })
+function getSecret() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("Missing JWT_SECRET in environment variables.");
+  }
+
+  return new TextEncoder().encode(secret);
+}
+
+export async function createSessionToken(staff: StaffSession) {
+  return new SignJWT({
+    email: staff.email,
+    name: staff.name || staff.email,
+    role: staff.role || "staff",
+  })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(TOKEN_EXPIRY)
-    .sign(JWT_SECRET);
+    .setExpirationTime("8h")
+    .sign(getSecret());
 }
 
-export async function verifyToken(token: string): Promise<JWTPayload | null> {
+export async function verifySessionToken(token: string): Promise<StaffSession | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as unknown as JWTPayload;
+    const { payload } = await jwtVerify(token, getSecret());
+    const email = typeof payload.email === "string" ? payload.email : "";
+    if (!email) return null;
+
+    return {
+      email,
+      name: typeof payload.name === "string" ? payload.name : email,
+      role: typeof payload.role === "string" ? payload.role : "staff",
+    };
   } catch {
     return null;
   }
 }
-
-export { COOKIE_NAME };

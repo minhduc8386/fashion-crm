@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import CrmNavbar from "@/components/CrmNavbar";
 
 interface Customer {
   _id: string;
@@ -46,6 +45,7 @@ export default function CustomersPage() {
   const [search, setSearch] = useState("");
 
   const fetchCustomers = useCallback(async () => {
+    await Promise.resolve();
     setLoading(true);
     try {
       const res = await fetch("/api/customers");
@@ -59,7 +59,11 @@ export default function CustomersPage() {
   }, []);
 
   useEffect(() => {
-    fetchCustomers();
+    const timer = window.setTimeout(() => {
+      void fetchCustomers();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [fetchCustomers]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -126,15 +130,12 @@ export default function CustomersPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <CrmNavbar title="👥 Quản lý khách hàng" />
-
-      <div className="max-w-6xl mx-auto px-6 py-8">
+    <div>
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-2xl font-bold">Danh sách khách hàng</h2>
-            <p className="text-slate-400 text-sm mt-1">
+            <h1 className="text-2xl font-semibold text-slate-950">Danh sách khách hàng</h1>
+            <p className="text-slate-500 text-sm mt-1">
               {filteredCustomers.length}/{customers.length} khách hàng
             </p>
           </div>
@@ -144,12 +145,12 @@ export default function CustomersPage() {
               placeholder="Tìm theo tên, SĐT, email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="bg-slate-800 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 text-sm w-56 transition-colors"
+              className="w-56 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
             />
             <button
               id="btn-add-customer"
               onClick={() => { setShowForm(!showForm); setFieldErrors({}); setErrorMsg(""); }}
-              className="bg-purple-600 hover:bg-purple-500 text-white font-medium px-5 py-2 rounded-lg transition-colors whitespace-nowrap"
+              className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white transition-colors hover:bg-blue-700 whitespace-nowrap"
             >
               {showForm ? "✕ Đóng" : "+ Thêm KH"}
             </button>
@@ -158,74 +159,74 @@ export default function CustomersPage() {
 
         {/* Add Form */}
         {showForm && (
-          <div className="bg-slate-900 border border-white/10 rounded-xl p-6 mb-6">
-            <h3 className="text-white font-semibold mb-4">Thêm khách hàng mới</h3>
+          <div className="bg-white border border-slate-200 rounded-lg p-6 mb-6 shadow-sm">
+            <h2 className="text-slate-950 font-semibold mb-4">Thêm khách hàng mới</h2>
             <form onSubmit={handleSubmit} id="form-add-customer" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Name */}
               <div>
-                <label className="block text-slate-300 text-sm mb-1">
-                  Họ tên <span className="text-red-400">*</span>
+                <label className="block text-slate-700 text-sm mb-1">
+                  Họ tên <span className="text-red-600">*</span>
                 </label>
                 <input
                   id="customer-name" name="name" type="text"
                   value={form.name} onChange={handleChange}
                   placeholder="Nguyễn Văn A"
-                  className={`w-full bg-slate-800 border rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none transition-colors ${fieldErrors.name ? "border-red-500" : "border-white/10 focus:border-purple-500"}`}
+                  className={`w-full rounded-lg border bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 ${fieldErrors.name ? "border-red-500 focus:ring-red-100" : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"}`}
                 />
-                {fieldErrors.name && <p className="text-red-400 text-xs mt-1">{fieldErrors.name}</p>}
+                {fieldErrors.name && <p className="text-red-600 text-xs mt-1">{fieldErrors.name}</p>}
               </div>
 
               {/* Phone */}
               <div>
-                <label className="block text-slate-300 text-sm mb-1">
-                  Số điện thoại <span className="text-red-400">*</span>
+                <label className="block text-slate-700 text-sm mb-1">
+                  Số điện thoại <span className="text-red-600">*</span>
                 </label>
                 <input
                   id="customer-phone" name="phone" type="tel"
                   value={form.phone} onChange={handleChange}
                   placeholder="0901234567" maxLength={10}
-                  className={`w-full bg-slate-800 border rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none transition-colors ${fieldErrors.phone ? "border-red-500" : "border-white/10 focus:border-purple-500"}`}
+                  className={`w-full rounded-lg border bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 ${fieldErrors.phone ? "border-red-500 focus:ring-red-100" : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"}`}
                 />
-                {fieldErrors.phone && <p className="text-red-400 text-xs mt-1">{fieldErrors.phone}</p>}
+                {fieldErrors.phone && <p className="text-red-600 text-xs mt-1">{fieldErrors.phone}</p>}
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-slate-300 text-sm mb-1">Email</label>
+                <label className="block text-slate-700 text-sm mb-1">Email</label>
                 <input
                   id="customer-email" name="email" type="email"
                   value={form.email} onChange={handleChange}
                   placeholder="example@email.com"
-                  className={`w-full bg-slate-800 border rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none transition-colors ${fieldErrors.email ? "border-red-500" : "border-white/10 focus:border-purple-500"}`}
+                  className={`w-full rounded-lg border bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 ${fieldErrors.email ? "border-red-500 focus:ring-red-100" : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"}`}
                 />
-                {fieldErrors.email && <p className="text-red-400 text-xs mt-1">{fieldErrors.email}</p>}
+                {fieldErrors.email && <p className="text-red-600 text-xs mt-1">{fieldErrors.email}</p>}
               </div>
 
               {/* Address */}
               <div>
-                <label className="block text-slate-300 text-sm mb-1">Địa chỉ</label>
+                <label className="block text-slate-700 text-sm mb-1">Địa chỉ</label>
                 <input
                   id="customer-address" name="address" type="text"
                   value={form.address} onChange={handleChange}
                   placeholder="Địa chỉ"
-                  className="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
                 />
               </div>
 
               {/* Notes */}
               <div className="sm:col-span-2">
-                <label className="block text-slate-300 text-sm mb-1">Ghi chú</label>
+                <label className="block text-slate-700 text-sm mb-1">Ghi chú</label>
                 <textarea
                   id="customer-notes" name="notes"
                   value={form.notes} onChange={handleChange}
                   rows={2} placeholder="Ghi chú thêm"
-                  className="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors resize-none"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
                 />
               </div>
 
               {submitStatus === "error" && (
-                <div className="sm:col-span-2 bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-2">
-                  <p className="text-red-400 text-sm">{errorMsg}</p>
+                <div className="sm:col-span-2 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+                  <p className="text-red-700 text-sm">{errorMsg}</p>
                 </div>
               )}
 
@@ -233,7 +234,7 @@ export default function CustomersPage() {
                 <button
                   id="btn-save-customer" type="submit"
                   disabled={submitStatus === "loading"}
-                  className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-medium px-6 py-2.5 rounded-lg transition-colors"
+                  className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-medium px-6 py-2.5 rounded-lg transition-colors"
                 >
                   {submitStatus === "loading" ? "Đang lưu..." : "Lưu khách hàng"}
                 </button>
@@ -243,21 +244,21 @@ export default function CustomersPage() {
         )}
 
         {/* Table */}
-        <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
           {loading ? (
             <div className="space-y-3 p-6">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-10 bg-slate-800 rounded-lg animate-pulse" />
+                <div key={i} className="h-10 bg-slate-100 rounded-lg animate-pulse" />
               ))}
             </div>
           ) : filteredCustomers.length === 0 ? (
-            <div className="text-center py-16 text-slate-400">
+            <div className="text-center py-16 text-slate-500">
               {search ? "Không tìm thấy khách hàng phù hợp." : "Chưa có khách hàng nào."}
             </div>
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10 text-slate-400 text-left">
+                <tr className="border-b border-slate-200 bg-slate-50 text-slate-500 text-left">
                   <th className="px-4 py-3 font-medium">#</th>
                   <th className="px-4 py-3 font-medium">Họ tên</th>
                   <th className="px-4 py-3 font-medium">Điện thoại</th>
@@ -272,28 +273,28 @@ export default function CustomersPage() {
                 {filteredCustomers.map((c, i) => (
                   <tr
                     key={c._id}
-                    className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer group"
+                    className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors cursor-pointer group"
                     onClick={() => router.push(`/crm/customers/${c._id}`)}
                   >
                     <td className="px-4 py-3 text-slate-500">{i + 1}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600/50 to-blue-600/50 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                        <div className="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center text-xs font-bold text-white shrink-0">
                           {(c.name || c.full_name || "?").charAt(0).toUpperCase()}
                         </div>
-                        <span className="text-white font-medium capitalize">{c.name || c.full_name || "–"}</span>
+                        <span className="text-slate-950 font-medium capitalize">{c.name || c.full_name || "–"}</span>
                         {c.is_seeded && (
-                          <span className="text-xs text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded-full">FPT</span>
+                          <span className="text-xs text-blue-700 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-full">FPT</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-slate-300 font-mono text-xs">{c.phone}</td>
-                    <td className="px-4 py-3 text-slate-400 text-xs max-w-[180px] truncate hidden lg:table-cell">{c.address || "–"}</td>
-                    <td className="px-4 py-3 text-slate-400 text-xs hidden md:table-cell">{c.device_model || "–"}</td>
-                    <td className="px-4 py-3 text-purple-300 text-right font-semibold">{formatCurrency(c.total_spent || 0)}</td>
-                    <td className="px-4 py-3 text-slate-300 text-right">{c.invoice_count || 0}</td>
+                    <td className="px-4 py-3 text-slate-600 font-mono text-xs">{c.phone}</td>
+                    <td className="px-4 py-3 text-slate-500 text-xs max-w-[180px] truncate hidden lg:table-cell">{c.address || "–"}</td>
+                    <td className="px-4 py-3 text-slate-500 text-xs hidden md:table-cell">{c.device_model || "–"}</td>
+                    <td className="px-4 py-3 text-slate-900 text-right font-semibold">{formatCurrency(c.total_spent || 0)}</td>
+                    <td className="px-4 py-3 text-slate-600 text-right">{c.invoice_count || 0}</td>
                     <td className="px-4 py-3 text-right">
-                      <span className="text-xs text-purple-400 group-hover:text-purple-300 transition-colors">360° →</span>
+                      <span className="text-xs font-medium text-blue-600 group-hover:text-blue-700 transition-colors">360° →</span>
                     </td>
                   </tr>
                 ))}
@@ -301,7 +302,6 @@ export default function CustomersPage() {
             </table>
           )}
         </div>
-      </div>
     </div>
   );
 }

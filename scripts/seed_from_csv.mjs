@@ -30,26 +30,37 @@ const IMPORT_LIMIT = 150; // Số khách hàng sẽ import
 
 // ========== FASHION PRODUCT CATALOG (Fact Data) ==========
 const PRODUCTS = [
-  { name: "Áo thun basic unisex", price: 129000, category: "Áo" },
-  { name: "Áo polo nam cao cấp", price: 249000, category: "Áo" },
-  { name: "Áo sơ mi linen nữ", price: 319000, category: "Áo" },
-  { name: "Áo hoodie oversized", price: 399000, category: "Áo" },
-  { name: "Áo khoác dù 2 lớp", price: 549000, category: "Áo" },
-  { name: "Quần jean slim fit nam", price: 479000, category: "Quần" },
-  { name: "Quần short thể thao", price: 199000, category: "Quần" },
-  { name: "Quần tây công sở nữ", price: 429000, category: "Quần" },
-  { name: "Quần jogger cotton", price: 279000, category: "Quần" },
-  { name: "Chân váy midi hoa nhí", price: 359000, category: "Váy" },
-  { name: "Đầm wrap midi nữ", price: 589000, category: "Váy" },
-  { name: "Giày sneaker basic", price: 799000, category: "Giày" },
-  { name: "Dép sandal nữ", price: 349000, category: "Giày" },
-  { name: "Túi tote canvas", price: 299000, category: "Phụ kiện" },
-  { name: "Thắt lưng da nam", price: 249000, category: "Phụ kiện" },
-  { name: "Mũ bucket unisex", price: 179000, category: "Phụ kiện" },
-  { name: "Tất vớ fashion set 3 đôi", price: 89000, category: "Phụ kiện" },
-  { name: "Set đồ pajama nữ", price: 449000, category: "Đồ bộ" },
-  { name: "Áo len cổ lọ", price: 499000, category: "Áo" },
-  { name: "Quần cargo nhiều túi", price: 459000, category: "Quần" },
+  { product_id: "PRD-TSHIRT-BASIC", sku: "SKU-TSHIRT-BASIC", name: "Áo thun basic unisex", price: 129000, category: "Áo" },
+  { product_id: "PRD-POLO-PREMIUM", sku: "SKU-POLO-PREMIUM", name: "Áo polo nam cao cấp", price: 249000, category: "Áo" },
+  { product_id: "PRD-SHIRT-LINEN", sku: "SKU-SHIRT-LINEN", name: "Áo sơ mi linen nữ", price: 319000, category: "Áo" },
+  { product_id: "PRD-HOODIE-OVERSIZED", sku: "SKU-HOODIE-OVERSIZED", name: "Áo hoodie oversized", price: 399000, category: "Áo" },
+  { product_id: "PRD-JACKET-WIND", sku: "SKU-JACKET-WIND", name: "Áo khoác dù 2 lớp", price: 549000, category: "Áo" },
+  { product_id: "PRD-JEAN-SLIM", sku: "SKU-JEAN-SLIM", name: "Quần jean slim fit nam", price: 479000, category: "Quần" },
+  { product_id: "PRD-SHORT-SPORT", sku: "SKU-SHORT-SPORT", name: "Quần short thể thao", price: 199000, category: "Quần" },
+  { product_id: "PRD-TROUSER-OFFICE", sku: "SKU-TROUSER-OFFICE", name: "Quần tây công sở nữ", price: 429000, category: "Quần" },
+  { product_id: "PRD-JOGGER-COTTON", sku: "SKU-JOGGER-COTTON", name: "Quần jogger cotton", price: 279000, category: "Quần" },
+  { product_id: "PRD-SKIRT-MIDI", sku: "SKU-SKIRT-MIDI", name: "Chân váy midi hoa nhí", price: 359000, category: "Váy" },
+  { product_id: "PRD-DRESS-WRAP", sku: "SKU-DRESS-WRAP", name: "Đầm wrap midi nữ", price: 589000, category: "Váy" },
+  { product_id: "PRD-SNEAKER-BASIC", sku: "SKU-SNEAKER-BASIC", name: "Giày sneaker basic", price: 799000, category: "Giày" },
+  { product_id: "PRD-SANDAL-WOMEN", sku: "SKU-SANDAL-WOMEN", name: "Dép sandal nữ", price: 349000, category: "Giày" },
+  { product_id: "PRD-TOTE-CANVAS", sku: "SKU-TOTE-CANVAS", name: "Túi tote canvas", price: 299000, category: "Phụ kiện" },
+  { product_id: "PRD-BELT-LEATHER", sku: "SKU-BELT-LEATHER", name: "Thắt lưng da nam", price: 249000, category: "Phụ kiện" },
+  { product_id: "PRD-BUCKET-HAT", sku: "SKU-BUCKET-HAT", name: "Mũ bucket unisex", price: 179000, category: "Phụ kiện" },
+  { product_id: "PRD-SOCK-SET", sku: "SKU-SOCK-SET", name: "Tất vớ fashion set 3 đôi", price: 89000, category: "Phụ kiện" },
+  { product_id: "PRD-PAJAMA-SET", sku: "SKU-PAJAMA-SET", name: "Set đồ pajama nữ", price: 449000, category: "Đồ bộ" },
+  { product_id: "PRD-SWEATER-TURTLENECK", sku: "SKU-SWEATER-TURTLENECK", name: "Áo len cổ lọ", price: 499000, category: "Áo" },
+  { product_id: "PRD-CARGO-PANTS", sku: "SKU-CARGO-PANTS", name: "Quần cargo nhiều túi", price: 459000, category: "Quần" },
+];
+
+const CHANNELS = [
+  "Website",
+  "Shopee",
+  "TikTok Shop",
+  "Facebook",
+  "Offline Store",
+  "Partner/FPT",
+  "Walmart",
+  "Weee",
 ];
 
 // ========== HELPERS ==========
@@ -91,6 +102,10 @@ function generatePhone() {
   return prefix + suffix;
 }
 
+function randomChannel() {
+  return CHANNELS[Math.floor(Math.random() * CHANNELS.length)];
+}
+
 function generateInvoices(customerId, customerName, count) {
   const invoices = [];
   const baseDate = new Date("2023-01-01");
@@ -117,11 +132,16 @@ function generateInvoices(customerId, customerName, count) {
       const product = PRODUCTS[idx];
       const quantity = Math.floor(Math.random() * 3) + 1;
       return {
+        product_id: product.product_id,
+        sku: product.sku,
         name: product.name,
+        product_name: product.name,
         category: product.category,
         price: product.price,
+        unit_price: product.price,
         quantity,
         subtotal: product.price * quantity,
+        total_price: product.price * quantity,
       };
     });
 
@@ -132,6 +152,8 @@ function generateInvoices(customerId, customerName, count) {
       customer_name: customerName,
       items,
       total_amount,
+      channel: randomChannel(),
+      order_date: invoiceDate,
       notes: "",
       created_at: invoiceDate,
       updated_at: invoiceDate,
@@ -166,7 +188,6 @@ async function main() {
     const oldIds = oldCustomers.map((c) => c._id);
     await db.collection("customers").deleteMany({ is_seeded: true });
     if (oldIds.length > 0) {
-      const { ObjectId } = await import("mongodb");
       await db.collection("invoices").deleteMany({ customer_id: { $in: oldIds } });
     }
     console.log("✅ Đã xóa dữ liệu cũ\n");
