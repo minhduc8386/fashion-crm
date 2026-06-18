@@ -2,6 +2,15 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 interface Customer {
   _id: string;
@@ -15,6 +24,39 @@ interface Customer {
   created_at: string;
   device_model?: string;
   is_seeded?: boolean;
+}
+
+interface CustomerDashboardData {
+  kpis: {
+    totalCustomers: number;
+    newCustomers: number;
+    repeatCustomers: number;
+    vipCustomers: number;
+    averageLtv: number;
+    averageOrdersPerCustomer: number;
+    averageCustomerTenure: number;
+    customersWithNoOrders: number;
+  };
+  tierDistribution: Array<{ tier: string; customers: number }>;
+  sourceDistribution: Array<{ source: string; customers: number }>;
+  topCustomersByLtv: Array<{
+    _id: string;
+    full_name: string;
+    phone: string;
+    email: string;
+    total_spent: number;
+    invoice_count: number;
+    tier: string;
+  }>;
+  recentCustomers: Array<{
+    _id: string;
+    full_name: string;
+    phone: string;
+    email: string;
+    created_at: string | null;
+    tier: string;
+  }>;
+  source: string;
 }
 
 const EMPTY_FORM = { name: "", phone: "", email: "", address: "", notes: "" };
@@ -33,10 +75,25 @@ function validateEmail(email: string): string | null {
   return null;
 }
 
+function tierClass(tier: string) {
+  if (tier === "VIP") return "border-blue-200 bg-blue-50 text-blue-700";
+  if (tier === "Loyal") return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  if (tier === "Regular") return "border-amber-200 bg-amber-50 text-amber-700";
+  return "border-slate-200 bg-slate-50 text-slate-700";
+}
+
+function formatDate(value: string | null) {
+  if (!value) return "Estimated";
+  return new Intl.DateTimeFormat("vi-VN").format(new Date(value));
+}
+
 export default function CustomersPage() {
   const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [dashboard, setDashboard] = useState<CustomerDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
+  const [dashboardError, setDashboardError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -58,13 +115,29 @@ export default function CustomersPage() {
     }
   }, []);
 
+  const fetchCustomerDashboard = useCallback(async () => {
+    setDashboardLoading(true);
+    setDashboardError("");
+    try {
+      const res = await fetch("/api/customers/dashboard", { cache: "no-store" });
+      const data = await res.json();
+      if (data.success) setDashboard(data.data);
+      else setDashboardError(data.message || "Không thể tải dashboard khách hàng.");
+    } catch {
+      setDashboardError("Không thể kết nối server để tải dashboard khách hàng.");
+    } finally {
+      setDashboardLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       void fetchCustomers();
+      void fetchCustomerDashboard();
     }, 0);
 
     return () => window.clearTimeout(timer);
-  }, [fetchCustomers]);
+  }, [fetchCustomers, fetchCustomerDashboard]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -106,7 +179,8 @@ export default function CustomersPage() {
         setFieldErrors({});
         setShowForm(false);
         setSubmitStatus("idle");
-        fetchCustomers();
+        void fetchCustomers();
+        void fetchCustomerDashboard();
       } else {
         setSubmitStatus("error");
         setErrorMsg(data.message || "Có lỗi xảy ra.");
@@ -156,6 +230,138 @@ export default function CustomersPage() {
             </button>
           </div>
         </div>
+
+        {/* Customer Dashboard */}
+        <section className="mb-6 space-y-4">
+          {dashboardError && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+              {dashboardError}
+            </div>
+          )}
+
+          {dashboardLoading ? (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div key={index} className="h-28 animate-pulse rounded-lg border border-slate-200 bg-white" />
+              ))}
+            </div>
+          ) : dashboard ? (
+            <>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-blue-700">Customer Dashboard</p>
+                  <h2 className="mt-1 text-xl font-semibold text-slate-950">Phân tích khách hàng</h2>
+                </div>
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
+                  {dashboard.source}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                {[
+                  ["Total Customers", dashboard.kpis.totalCustomers.toLocaleString("vi-VN"), "Tổng khách hàng"],
+                  ["New Customers", dashboard.kpis.newCustomers.toLocaleString("vi-VN"), "30 ngày gần nhất"],
+                  ["Repeat Customers", dashboard.kpis.repeatCustomers.toLocaleString("vi-VN"), "invoice_count > 1"],
+                  ["VIP Customers", dashboard.kpis.vipCustomers.toLocaleString("vi-VN"), "Tier VIP"],
+                  ["Average LTV", formatCurrency(dashboard.kpis.averageLtv), "TB total_spent"],
+                  ["Avg Orders / Customer", dashboard.kpis.averageOrdersPerCustomer.toLocaleString("vi-VN"), "TB số đơn"],
+                  ["Avg Customer Tenure", `${dashboard.kpis.averageCustomerTenure.toLocaleString("vi-VN")} days`, "Tuổi đời TB"],
+                  ["Customers with No Orders", dashboard.kpis.customersWithNoOrders.toLocaleString("vi-VN"), "Chưa có hóa đơn"],
+                ].map(([label, value, helper]) => (
+                  <article key={label} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                    <p className="text-sm font-medium text-slate-500">{label}</p>
+                    <p className="mt-3 text-xl font-semibold text-slate-950">{value}</p>
+                    <p className="mt-2 text-xs text-slate-500">{helper}</p>
+                  </article>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                  <h3 className="font-semibold text-slate-950">Customer Tier Distribution</h3>
+                  <div className="mt-4 h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={dashboard.tierDistribution}>
+                        <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
+                        <XAxis dataKey="tier" tick={{ fill: "#64748b", fontSize: 12 }} />
+                        <YAxis allowDecimals={false} tick={{ fill: "#64748b", fontSize: 12 }} />
+                        <Tooltip />
+                        <Bar dataKey="customers" name="Customers" fill="#2563eb" radius={[6, 6, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                  <h3 className="font-semibold text-slate-950">Customer Source Distribution</h3>
+                  <div className="mt-4 h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={dashboard.sourceDistribution.slice(0, 8)}>
+                        <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" />
+                        <XAxis dataKey="source" tick={{ fill: "#64748b", fontSize: 12 }} />
+                        <YAxis allowDecimals={false} tick={{ fill: "#64748b", fontSize: 12 }} />
+                        <Tooltip />
+                        <Bar dataKey="customers" name="Customers" fill="#0f766e" radius={[6, 6, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                  <h3 className="font-semibold text-slate-950">Top Customers by LTV</h3>
+                  <div className="mt-4 space-y-3">
+                    {dashboard.topCustomersByLtv.map((customer) => (
+                      <button
+                        key={customer._id}
+                        type="button"
+                        onClick={() => router.push(`/crm/customers/${customer._id}`)}
+                        className="flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-left transition-colors hover:bg-blue-50"
+                      >
+                        <div>
+                          <p className="font-medium text-slate-950">{customer.full_name}</p>
+                          <p className="text-xs text-slate-500">{customer.phone || customer.email || "No contact"}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-slate-950">{formatCurrency(customer.total_spent)}</p>
+                          <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-xs font-semibold ${tierClass(customer.tier)}`}>
+                            {customer.tier}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+                  <h3 className="font-semibold text-slate-950">Recent Customers</h3>
+                  <div className="mt-4 space-y-3">
+                    {dashboard.recentCustomers.map((customer) => (
+                      <button
+                        key={customer._id}
+                        type="button"
+                        onClick={() => router.push(`/crm/customers/${customer._id}`)}
+                        className="flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-left transition-colors hover:bg-blue-50"
+                      >
+                        <div>
+                          <p className="font-medium text-slate-950">{customer.full_name}</p>
+                          <p className="text-xs text-slate-500">{customer.phone || customer.email || "No contact"}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-slate-600">{formatDate(customer.created_at)}</p>
+                          <span className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-xs font-semibold ${tierClass(customer.tier)}`}>
+                            {customer.tier}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : null}
+        </section>
 
         {/* Add Form */}
         {showForm && (
